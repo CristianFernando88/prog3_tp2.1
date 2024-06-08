@@ -1,4 +1,20 @@
-class Sensor {}
+class Sensor {
+
+    constructor(id,name,type,value,unit,updated_at){
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.value = value;
+        this.unit = unit;
+        this.updated_at = updated_at;
+    }
+
+    
+    set updateValue(newValue){
+        this.value = newValue;
+        this.updated_at = new Date().toString();
+    }
+}
 
 class SensorManager {
     constructor() {
@@ -27,13 +43,29 @@ class SensorManager {
                     newValue = (Math.random() * 100).toFixed(2);
             }
             sensor.updateValue = newValue;
+            console.log(sensor.updated_at);//prueba sacar
             this.render();
         } else {
             console.error(`Sensor ID ${id} no encontrado`);
         }
     }
 
-    async loadSensors(url) {}
+    async loadSensors(url) {
+        try{
+            const response = await fetch(url);
+            const data = await response.json();
+            data.forEach((dataSensor)=>{
+                console.log(dataSensor);
+                let sensorObj = new Sensor(dataSensor.id,dataSensor.name,dataSensor.type,dataSensor.value,dataSensor.unit,dataSensor.updated_at);
+                this.addSensor(sensorObj);
+                console.log(sensorObj.updated_at);
+            });
+            this.render();
+        }catch(error){
+            console.log(error);
+        }
+        
+    }
 
     render() {
         const container = document.getElementById("sensor-container");
