@@ -6,11 +6,41 @@ class Currency {
 }
 
 class CurrencyConverter {
-    constructor() {}
+    constructor(apiUrl) {
+        this.apiUrl = apiUrl;//URL base de la API de Frankfurter.
+        this.currencies = []; //arreglo que almacenará instancias de la clase `Currency`. Al instanciar un objeto de esta clase, el arreglo `currencies` debe estar vacío.
+    }
 
-    getCurrencies(apiUrl) {}
+    async getCurrencies() {
+        try{
+            const response = await fetch(this.apiUrl+"/currencies");
+            const data = await response.json();
+            for(let propiedad in data){
+                let currenciesObj = new Currency(propiedad,data[propiedad]);
+                this.currencies.push(currenciesObj);
+            }
+        }catch(error){
+            console.log(error);
+        }
+    }
 
-    convertCurrency(amount, fromCurrency, toCurrency) {}
+    async convertCurrency(amount, fromCurrency, toCurrency) {
+        //- `GET /latest?amount=<input_amount>&from=<from_currency>&to=<target_currency>`: Obtiene la conversión de una moneda a otra.
+        if(fromCurrency.code===toCurrency.code){
+            return amount;
+        }else if(fromCurrency.code!==toCurrency.code){
+            try {
+                const response = await fetch(this.apiUrl+"/latest?amount="+amount+"&from="+fromCurrency.code+"&to="+toCurrency.code);
+                const data = await response.json();
+                console.log(data.rates);
+                return parseFloat(data.rates[toCurrency.code]);
+            } catch (error) {
+                console.log(error);
+                return null;
+            }
+        
+        }
+    }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -20,7 +50,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const toCurrencySelect = document.getElementById("to-currency");
 
     const converter = new CurrencyConverter("https://api.frankfurter.app");
-
     await converter.getCurrencies();
     populateCurrencies(fromCurrencySelect, converter.currencies);
     populateCurrencies(toCurrencySelect, converter.currencies);
@@ -35,13 +64,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const toCurrency = converter.currencies.find(
             (currency) => currency.code === toCurrencySelect.value
         );
-
         const convertedAmount = await converter.convertCurrency(
             amount,
             fromCurrency,
             toCurrency
         );
-
+    
         if (convertedAmount !== null && !isNaN(convertedAmount)) {
             resultDiv.textContent = `${amount} ${
                 fromCurrency.code
