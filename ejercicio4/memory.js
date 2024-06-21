@@ -31,13 +31,32 @@ class Card {
         const cardElement = this.element.querySelector(".card");
         cardElement.classList.remove("flipped");
     }
+
+    /* - Definir el método `toggleFlip()` que cambia el estado de volteo de la carta en función de su estado actual.
+    - Implementar el método `matches(otherCard)` que verifica si la carta actual coincide con otra carta. */
+    toggleFlip(){
+        if(this.isFlipped){
+            this.#flip();
+            this.isFlipped = false;
+        }else{
+            this.#unflip();
+            this.isFlipped = true;
+        }
+        
+    }
+
+    matches(otherCard){
+        return this.name === otherCard.thisName ? true : false;
+    }
 }
 
 class Board {
+    #intialCards;
     constructor(cards) {
         this.cards = cards;
         this.fixedGridElement = document.querySelector(".fixed-grid");
         this.gameBoardElement = document.getElementById("game-board");
+        this.#intialCards = cards;
     }
 
     #calculateColumns() {
@@ -73,6 +92,23 @@ class Board {
         if (this.onCardClick) {
             this.onCardClick(card);
         }
+       /* card.toggleFlip(); */
+    }
+
+    /* - Implementar el método `shuffleCards()` que mezcla las cartas del tablero. El criterio de mezcla esta dispuesto a elección del estudiante.
+    - Implementar el método `reset()` que reinicia el tablero.
+    - Implementar el método `flipDownAllCards()` que posiciona todas las cartas en su estado inicial. Es necesario para reiniciar el tablero.
+    - Implementar el método `reset()` que reinicia el tablero. Debe emplear otros métodos de la clase `Board` para realizar esta tarea. */
+    shuffleCards(){
+        this.cards.sort((a,b) => Math.random() - 0.5);
+    }
+    
+    flipDownAllCards(){
+        this.cards= this.#intialCards;    
+    }
+    reset(){
+        this.flipDownAllCards();
+        this.render();
     }
 }
 
@@ -100,6 +136,14 @@ class MemoryGame {
             if (this.flippedCards.length === 2) {
                 setTimeout(() => this.checkForMatch(), this.flipDuration);
             }
+        }
+    }
+    /* - Implementar el método `checkForMatch()` que verifica si las cartas volteadas coinciden. En caso de coincidir, las cartas deben ser añadidas al conjunto de cartas emparejadas. Es fundamental para que el método `#handleCardClick()` funcione correctamente.
+    - Implementar el método `resetGame()` que reinicia el juego. Debe emplear otros métodos de la clase `MemoryGame` para realizar esta tarea. */
+    checkForMatch(){
+        if(this.flippedCards[0].matches(this.flippedCards[1])){
+            this.matchedCards.push(this.flippedCards[0]);
+            this.matchedCards.push(this.flippedCards[1]);
         }
     }
 }
