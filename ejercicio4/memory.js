@@ -36,27 +36,25 @@ class Card {
     - Implementar el método `matches(otherCard)` que verifica si la carta actual coincide con otra carta. */
     toggleFlip(){
         if(this.isFlipped){
-            this.#flip();
+            this.#unflip();
             this.isFlipped = false;
         }else{
-            this.#unflip();
+            this.#flip();
             this.isFlipped = true;
         }
         
     }
 
     matches(otherCard){
-        return this.name === otherCard.thisName ? true : false;
+        return this.name === otherCard.name ? true : false;
     }
 }
 
 class Board {
-    #intialCards;
     constructor(cards) {
         this.cards = cards;
         this.fixedGridElement = document.querySelector(".fixed-grid");
         this.gameBoardElement = document.getElementById("game-board");
-        this.#intialCards = cards;
     }
 
     #calculateColumns() {
@@ -92,7 +90,6 @@ class Board {
         if (this.onCardClick) {
             this.onCardClick(card);
         }
-       /* card.toggleFlip(); */
     }
 
     /* - Implementar el método `shuffleCards()` que mezcla las cartas del tablero. El criterio de mezcla esta dispuesto a elección del estudiante.
@@ -104,10 +101,15 @@ class Board {
     }
     
     flipDownAllCards(){
-        this.cards= this.#intialCards;    
+        this.cards.forEach((card)=>{
+            if(card.isFlipped){
+                card.toggleFlip();
+            }
+        }) 
     }
     reset(){
         this.flipDownAllCards();
+        this.shuffleCards();
         this.render();
     }
 }
@@ -144,7 +146,15 @@ class MemoryGame {
         if(this.flippedCards[0].matches(this.flippedCards[1])){
             this.matchedCards.push(this.flippedCards[0]);
             this.matchedCards.push(this.flippedCards[1]);
+        }else{
+            this.flippedCards[0].toggleFlip();
+            this.flippedCards[1].toggleFlip();
         }
+        this.flippedCards=[];
+    }
+
+    resetGame(){
+        this.board.reset()
     }
 }
 
