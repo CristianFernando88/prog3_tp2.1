@@ -21,8 +21,11 @@ class Reservation {
         return "Fecha reserva: "+this.date.toLocaleString()+"<br>Cliente: "+this.customer.info+"<br>Cantidad de comensales: "+this.guests;
     }
     static validateReservation(reservaDate,reservaGuests){
-        if(new Date(reservaDate).toLocaleString() >= new Date().toLocaleString() && reservaGuests > 0){
-            return true
+        if(typeof(reservaDate)=="string"){
+            reservaDate = new Date(reservaDate);
+        }
+        if(reservaDate >= new Date() && reservaGuests > 0){
+            return true;
         }
         return false;
     }
@@ -70,10 +73,8 @@ document
 
         const customerName = document.getElementById("customer-name").value;
         const customerEmail = document.getElementById("customer-email").value;
-        const reservationDate =
-            document.getElementById("reservation-date").value;
+        const reservationDate = document.getElementById("reservation-date").value;
         const guests = parseInt(document.getElementById("guests").value);
-
         if (Reservation.validateReservation(reservationDate, guests)) {
             const customerId = restaurant.reservations.length + 1;
             const reservationId = restaurant.reservations.length + 1;
